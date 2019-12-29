@@ -1,0 +1,4 @@
+com\minsait\sopadeletras\SopaDeLetras.class
+com\minsait\sopadeletras\controller\GUITableroController.class
+com\minsait\sopadeletras\GUITablero.class
+com\minsait\sopadeletras\controller\GUISopaDeLetrasController.class

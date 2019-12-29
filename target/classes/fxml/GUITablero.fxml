@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<AnchorPane id="AnchorPane" prefHeight="325.0" prefWidth="367.0" style="-fx-background-color: #fff;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.minsait.sopadeletras.controller.GUITableroController">
+   <children>
+      <BorderPane fx:id="principalPane" prefHeight="325.0" prefWidth="367.0" style="-fx-background-color: #fff;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <bottom>
+            <BorderPane prefHeight="36.0" prefWidth="367.0" BorderPane.alignment="CENTER">
+               <left>
+                  <JFXButton fx:id="botonGuardar" onAction="#botonGuardarEvent" prefHeight="31.0" prefWidth="104.0" style="-fx-background-color: #23a3ff;" text="Guardar" textFill="WHITE" BorderPane.alignment="CENTER">
+                     <graphic>
+                        <FontAwesomeIconView fill="WHITE" glyphName="SAVE" size="13" textAlignment="JUSTIFY" />
+                     </graphic>
+                     <BorderPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </BorderPane.margin>
+                  </JFXButton>
+               </left>
+               <right>
+                  <JFXButton fx:id="botonSalir" onAction="#botonSalirEvent" prefHeight="31.0" prefWidth="104.0" style="-fx-background-color: #e51c23;" text="Salir" textFill="WHITE" BorderPane.alignment="CENTER">
+                     <graphic>
+                        <FontAwesomeIconView fill="WHITE" glyphName="ANGLE_LEFT" size="13" textAlignment="JUSTIFY" />
+                     </graphic>
+                     <BorderPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </BorderPane.margin>
+                  </JFXButton>
+               </right>
+            </BorderPane>
+         </bottom>
+         <top>
+            <BorderPane fx:id="borderTopPane" prefHeight="35.0" prefWidth="367.0" style="-fx-background-color: #fff;" BorderPane.alignment="CENTER">
+               <center>
+                  <Label fx:id="labelPalabrasABuscar" alignment="CENTER" prefHeight="30.0" prefWidth="555.0" style="-fx-background-color: rgba(35,163,2557, 0.07); -fx-border-color: #23a3ff;" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                     <graphic>
+                        <FontAwesomeIconView fill="#07cd75" glyphName="CHECK_CIRCLE" size="16" />
+                     </graphic>
+                  </Label>
+               </center></BorderPane>
+         </top></BorderPane>
+   </children>
+</AnchorPane>

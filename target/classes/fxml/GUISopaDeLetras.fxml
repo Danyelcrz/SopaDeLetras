@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXRadioButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane id="AnchorPane" prefHeight="355.0" prefWidth="293.0" style="-fx-background-color: #FFF;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.minsait.sopadeletras.controller.GUISopaDeLetrasController">
+ <children>
+      <Text fill="#575757" layoutX="24.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Dificultad" wrappingWidth="120.99999678134918" />
+      <Text fill="#575757" layoutX="25.0" layoutY="176.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Generar las palabras" wrappingWidth="120.99999640882015" />
+      <Line endX="141.0" layoutX="126.0" layoutY="69.0" startX="-100.0" stroke="#cdcdcd" />
+      <JFXComboBox fx:id="comboBoxTamanioTablero" layoutX="26.0" layoutY="82.0" prefHeight="25.0" prefWidth="242.0" promptText="Tamaño del tablero" />
+      <JFXComboBox fx:id="comboBoxNumeroPalabras" layoutX="26.0" layoutY="120.0" prefHeight="25.0" prefWidth="242.0" promptText="Cantidad de Palabras" />
+      <JFXRadioButton fx:id="radioButtonFacil" layoutX="24.0" layoutY="37.0" onAction="#radioButtonFacilEvent" text="Facil" />
+      <JFXRadioButton fx:id="radioButtonMedio" layoutX="113.0" layoutY="37.0" onAction="#radioButtonMedioEvent" text="Medio" />
+      <JFXRadioButton fx:id="radioButtonDificil" layoutX="211.0" layoutY="37.0" onAction="#radioButtonDificilEvent" text="Dificil" />
+      <JFXCheckBox fx:id="checkBoxManual" layoutX="118.0" layoutY="195.0" onAction="#checkBoxManualEvent" text="Manual" />
+      <JFXCheckBox fx:id="checkBoxMixta" layoutX="212.0" layoutY="195.0" onAction="#checkBoxMixtaEvent" text="Mixta" />
+      <JFXCheckBox fx:id="checkBoxAleatorio" layoutX="26.0" layoutY="195.0" onAction="#checkBoxAleatorioEvent" text="Aleatorio" />
+      <JFXTextField fx:id="textFieldIngresarPalabra" layoutX="25.0" layoutY="242.0" prefHeight="25.0" prefWidth="208.0" promptText="Ingrese su palabra" />
+      <JFXButton fx:id="button" layoutX="97.0" layoutY="318.0" onAction="#handleButtonAction" prefHeight="31.0" prefWidth="104.0" style="-fx-background-color: #4ACA83;" text="Comenzar" textFill="WHITE">
+         <graphic>
+            <FontAwesomeIconView fill="WHITE" glyphName="ANGLE_RIGHT" size="15" textAlignment="JUSTIFY" />
+         </graphic>
+      </JFXButton>
+      <JFXButton fx:id="buttonGuardarPalabra" contentDisplay="GRAPHIC_ONLY" layoutX="239.0" layoutY="242.0" onAction="#buttonGuardarPalabraEvent" prefHeight="18.0" prefWidth="27.0" style="-fx-background-color: #23a3ff;" text="add" textFill="WHITE">
+         <graphic>
+            <FontAwesomeIconView fill="WHITE" glyphName="PLUS" size="13" textAlignment="JUSTIFY" />
+         </graphic>
+      </JFXButton>
+      <Line endX="141.0" layoutX="124.0" layoutY="223.0" startX="-100.0" stroke="#cdcdcd" />
+      <Label fx:id="label" alignment="CENTER" layoutX="70.0" layoutY="283.0" prefHeight="25.0" prefWidth="159.0" style="-fx-background-color: rgba(35,163,2557, 0.07); -fx-border-color: #23a3ff;" text="Agregada" textAlignment="CENTER">
+         <graphic>
+            <FontAwesomeIconView fill="#07cd75" glyphName="CHECK_CIRCLE" size="16" />
+         </graphic>
+      </Label>
+    </children>
+</AnchorPane>
