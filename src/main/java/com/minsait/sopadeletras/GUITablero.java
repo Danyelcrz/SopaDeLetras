@@ -45,7 +45,7 @@ public class GUITablero extends Application {
         stage.show();
     }
 
-    public void empezarProceso(List<String> palabras, char dificultad) {
+    public void empezarProceso(List<String> palabras, String dificultad) {
         controller.colocarPalabras(dificultad, palabras);
         controller.rellenaVacios();
         controller.imprimeTablero();

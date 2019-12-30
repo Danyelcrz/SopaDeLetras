@@ -2,7 +2,8 @@ package com.minsait.sopadeletras.controller;
 
 /**
  *
- * @author Daniel Cruz
+ * @author Daniel Cruz, María Guadalupe Sánchez Alcántara
+ *
  */
 import java.io.File;
 import java.io.IOException;
@@ -121,39 +122,64 @@ public class GUITableroController implements Initializable {
      * @return boolean true si logró situar las palabras en el tablero false en
      * caso contrario
      */
-    public boolean colocarPalabras(char dificultad, List<String> palabras) {
+    public boolean colocarPalabras(String dificultad, List<String> palabras) {
         List<String> palabrasColocadas = new ArrayList<>(); // lista que almacena las palabras que se han logrado colocar en el tablero
 
-        if (dificultad == 'f') { //si el usuario seleccionó modo fácil, solo se intentará colocar las palabras de forma horizontal y vertical
-            for (String palabra : palabras) { //for each que recorre toda la lista de palabras que se ingresarán al tablero
-                Paint color = Color.color(Math.random(), Math.random(), Math.random()); //Asigna un color aleatorio por cada palabra a colocar
-                palabraColocada: //BLOQUE que validará si es posible colocar la palabra en el tablero
-                {
-                    for (int i = 0; i < tableroMatriz.length; i++) {
-                        for (int j = 0; j < tableroMatriz.length; j++) {
-                            if (colocarHorizontal(palabra, i, j, color)) {
-                                System.out.println(palabra + " colocada horizontalmente en " + i + "," + j);
-                                palabrasColocadas.add(palabra);
-                                break palabraColocada; // si se logró colocar la palabra de forma horizontal, salimos de los fors y continua con la siguiente palabra
-                            } else if (colocarVertical(palabra, i, j, color)) {
-                                System.out.println(palabra + " colocada verticalmente en " + i + "," + j);
-                                palabrasColocadas.add(palabra);
-                                break palabraColocada; // si se logró colocar la palabra de forma horizontal, salimos de los fors y continua con la siguiente palabra
+        switch (dificultad) {
+            case "f": //si el usuario seleccionó modo fácil, solo se intentará colocar las palabras de forma horizontal y vertical
+                for (String palabra : palabras) { //for each que recorre toda la lista de palabras que se ingresarán al tablero
+                    Paint color = Color.color(Math.random(), Math.random(), Math.random()); //Asigna un color aleatorio por cada palabra a colocar
+                    palabraColocada: //BLOQUE que validará si es posible colocar la palabra en el tablero
+                    {
+                        for (int i = 0; i < tableroMatriz.length; i++) {
+                            for (int j = 0; j < tableroMatriz.length; j++) {
+                                if (colocarHorizontal(palabra, i, j, color)) {
+                                    System.out.println(palabra + " colocada horizontalmente en " + i + "," + j);
+                                    palabrasColocadas.add(palabra);
+                                    break palabraColocada; // si se logró colocar la palabra de forma horizontal, salimos de los fors y continua con la siguiente palabra
+                                } else if (colocarVertical(palabra, i, j, color)) {
+                                    System.out.println(palabra + " colocada verticalmente en " + i + "," + j);
+                                    palabrasColocadas.add(palabra);
+                                    break palabraColocada; // si se logró colocar la palabra de forma horizontal, salimos de los fors y continua con la siguiente palabra
+                                }
                             }
                         }
                     }
                 }
-            }
-        }
-
-        if (dificultad == 'm') {
-            for (String palabra : palabras) {
-                Paint color = Color.color(Math.random(), Math.random(), Math.random()); //Asigna un color aleatorio por cada palabra a colocar
-                palabraColocada: //BLOQUE que validará si es posible colocar la palabra en el tablero
-                {
-                    for (int i = 0; i < tableroMatriz.length; i++) {
-                        for (int j = 0; j < tableroMatriz.length; j++) {
-                            /*if (i >= tableroMatriz.length && i >= 0) {
+                break;
+            case "m":
+                for (String palabra : palabras) { //for each que recorre toda la lista de palabras que se ingresarán al tablero
+                    Paint color = Color.color(Math.random(), Math.random(), Math.random()); //Asigna un color aleatorio por cada palabra a colocar
+                    palabraColocada: //BLOQUE que validará si es posible colocar la palabra en el tablero
+                    {
+                        for (int i = 0; i < tableroMatriz.length; i++) {
+                            for (int j = 0; j < tableroMatriz.length; j++) {
+                                if (colocarDiagonalSuperiorIzquierda(palabra, j, i, color)) {
+                                    System.out.println(palabra + " colocada diagonalmente en " + j + "," + i);
+                                    palabrasColocadas.add(palabra);
+                                    break palabraColocada; // si se logró colocar la palabra de forma horizontal, salimos de los fors y continua con la siguiente palabra
+                                } else if (colocarHorizontal(palabra, i, j, color)) {
+                                    System.out.println(palabra + " colocada horizontalmente en " + i + "," + j);
+                                    palabrasColocadas.add(palabra);
+                                    break palabraColocada; // si se logró colocar la palabra de forma horizontal, salimos de los fors y continua con la siguiente palabra
+                                } else if (colocarVertical(palabra, i, j, color)) {
+                                    System.out.println(palabra + " colocada verticalmente en " + i + "," + j);
+                                    palabrasColocadas.add(palabra);
+                                    break palabraColocada; // si se logró colocar la palabra de forma horizontal, salimos de los fors y continua con la siguiente palabra
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case "d": //TODO
+                for (String palabra : palabras) {
+                    Paint color = Color.color(Math.random(), Math.random(), Math.random()); //Asigna un color aleatorio por cada palabra a colocar
+                    palabraColocada: //BLOQUE que validará si es posible colocar la palabra en el tablero
+                    {
+                        for (int i = 0; i < tableroMatriz.length; i++) {
+                            for (int j = 0; j < tableroMatriz.length; j++) {
+                                /*if (i >= tableroMatriz.length && i >= 0) {
                                 if (colocarVerticalInv(palabra, i, j, color)) { //NOTA QUE PRIMERO SE PASA J, DESPUES I
                                     System.out.println(palabra + " colocada diagonalmente en " + i + "," + j);
                                     palabrasColocadas.add(palabra);
@@ -165,15 +191,15 @@ public class GUITableroController implements Initializable {
                                 break palabraColocada;
 
                             }*/
-                            if (i >= palabra.length() && j >= palabra.length()) {
-                                if (colocarDiagonalInferiorDerecha(palabra, i, j, color)) {
-                                    System.out.println(palabra + " colocada diagonal inf derecha en " + i + "," + j);
-                                    palabrasColocadas.add(palabra);
-                                    break palabraColocada;
-                                }
+                                if (i >= palabra.length() && j >= palabra.length()) {
+                                    if (colocarDiagonalInferiorDerecha(palabra, i, j, color)) {
+                                        System.out.println(palabra + " colocada diagonal inf derecha en " + i + "," + j);
+                                        palabrasColocadas.add(palabra);
+                                        break palabraColocada;
+                                    }
 
-                            }
-                            /*else if (i >= 0 && j >= tableroMatriz.length) {
+                                }
+                                /*else if (i >= 0 && j >= tableroMatriz.length) {
                                 colocarDiagonalInferiorIzquierda(palabra, i, j, color);
                                 System.out.println(palabra + " colocada diagonal inf derecha en " + i + "," + j);
                                 palabrasColocadas.add(palabra);
@@ -196,10 +222,11 @@ public class GUITableroController implements Initializable {
                                 palabrasColocadas.add(palabra);
                                 break palabraColocada; // si se logró colocar la palabra de forma horizontal, salimos de los fors y continua con la siguiente palabra
                             }*/
+                            }
                         }
                     }
                 }
-            }
+                break;
         }
         labelPalabrasABuscar.setText("Palabras a encontrar: " + palabrasColocadas.toString()); // muestra las palabras que se lograron colocar en el UI
         return true;
@@ -224,7 +251,6 @@ public class GUITableroController implements Initializable {
         tableroMatriz[renglon][columna] = charLetra; // situa el carácter en el tablero (de consola)
         grid.getChildren().addAll(letra);// situa el carácter en el tablero (interfaz de usuario)
         return true;
-
     }
 
     /**
@@ -259,8 +285,8 @@ public class GUITableroController implements Initializable {
     }
 
     /**
-     * Método que situa una palabra de forma horizontal en una matriz pasada
-     * como parámetro.
+     * Método que situa una palabra de forma vertical en una matriz pasada como
+     * parámetro.
      *
      * @param palabra palabra a colocar
      * @param posicionRenglonComienzo coordenada y de la matriz en el que se
@@ -465,14 +491,14 @@ public class GUITableroController implements Initializable {
         return true;
     }
 
-    /**
-     * Método que situa una palabra de forma Vertical inferior en una matriz
+      /**
+     * Método que situa una palabra de forma Horizontal inverso en una matriz
      * pasada como parámetro.
      *
      * @param palabra palabra a colocar
-     * @param renglon coordenada y de la matriz en el que se comenzará a situar
+     * @param posicionRenglonComienzo coordenada y de la matriz en el que se comenzará a situar
      * la palabra
-     * @param columna coordenada x de la matriz en el que se comenzará a situar
+     * @param posicionColumnaFija coordenada x de la matriz en el que se comenzará a situar
      * la palabra
      * @param color color del que se pintará la palabra en la interfaz grafica
      *

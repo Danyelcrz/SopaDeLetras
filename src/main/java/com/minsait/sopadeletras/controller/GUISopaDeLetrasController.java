@@ -1,5 +1,9 @@
 package com.minsait.sopadeletras.controller;
 
+/**
+ *
+ * @author Daniel Cruz
+ */
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
@@ -18,21 +22,22 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 public class GUISopaDeLetrasController implements Initializable {
 
     List<String> palabrasIngresadas = new ArrayList<>(); //Lista que contiene todas las palabras que se ingresarán al tablero
-    int tamanioTablero = 7; //estable un valor por defecto del tamaño del tablero
-    int numeroPalabras = 6;//estable un valor por defecto de la cantidad de palabras
+    int tamanioTablero = 0; //establece un valor por defecto del tamaño del tablero
+    int numeroPalabras = 0;//establece un valor por defecto de la cantidad de palabras
     int contadorPalabrasAgregadas = 0; //contador global que va incremenetando conforme el usuario ingrese palabras manualmente
+    int numeroPalabrasAleatorias = 1; //contador global que va incremenetando conforme el usuario ingrese palabras manualmente (solo paso caso mixto)
 
-    @FXML
-    private Label label;
     @FXML
     private JFXRadioButton radioButtonFacil;
     @FXML
@@ -53,21 +58,31 @@ public class GUISopaDeLetrasController implements Initializable {
     private JFXTextField textFieldIngresarPalabra;
     @FXML
     private JFXButton buttonGuardarPalabra;
-    @FXML
     private JFXButton button;
+    @FXML
+    private JFXComboBox<Integer> comboBoxNumeroPalabrasAleatorias;
+    @FXML
+    private JFXButton buttonComenzar;
+    @FXML
+    private Label labelInfo;
 
     /**
-     * Rutina que setea valores iniciales por defecto 
+     * Rutina que setea valores iniciales por defecto
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        label.setVisible(false);
+        labelInfo.setVisible(false);
+        comboBoxNumeroPalabrasAleatorias.setDisable(true);
         comboBoxTamanioTablero.getItems().addAll(7, 8, 9);
         comboBoxNumeroPalabras.getItems().addAll(6, 7, 8);
         radioButtonFacil.setSelected(true);
-        checkBoxAleatorio.setSelected(true);
         textFieldIngresarPalabra.setDisable(true);
         buttonGuardarPalabra.setDisable(true);
+        try {
+            palabrasIngresadas = generarPalabras(6, 7);//Se llena la lista con las palabras aleatorias. 
+        } catch (IOException ex) {
+            Logger.getLogger(GUISopaDeLetrasController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -75,36 +90,28 @@ public class GUISopaDeLetrasController implements Initializable {
      *
      */
     @FXML
-    private void handleButtonAction(ActionEvent event) throws IOException {
+    private void buttonComenzarEvent(ActionEvent event) throws IOException {
         GUITablero guiTablero = new GUITablero();
-        tamanioTablero = comboBoxTamanioTablero.getValue(); //obtiene el valor que ingresó el usuario referente al tamaño del tablero
-        numeroPalabras = comboBoxNumeroPalabras.getValue();//obtiene el valor que ingresó el usuario referente al numero de palabras
         guiTablero.crearTablero(tamanioTablero); //crea un tablero con las dimensiones especificadas por el usuario
 
-        if (devolverModoPalabras().equals("al")) {//Si el usuario seleccionó que desea generar las palabras aleatoriamente
-            palabrasIngresadas = generarPalabras(numeroPalabras, tamanioTablero);//Se llena la lista con las palabras aleatorias. 
+        if (tamanioTablero > 0 && numeroPalabras > 0 && palabrasIngresadas.size() == numeroPalabras && devolverModoPalabras() != null) {
+            guiTablero.empezarProceso(palabrasIngresadas, devolverDificultad()); //el método devolverDificultad retorna f, m, d            
+            try {
+                guiTablero.start(new Stage());
+            } catch (Exception ex) {
+                Logger.getLogger(GUISopaDeLetrasController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            guiTablero.lanzarVista();
+            Stage stage = (Stage) buttonComenzar.getScene().getWindow();
+            stage.close();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(null);
+            alert.setTitle("Error");
+            alert.setContentText("Algo ocurrió en la aplicación :(");
+            alert.showAndWait();
         }
 
-        switch (devolverDificultad()) {
-            case "f"://Si el usuario seleccionó el modo fácil
-                guiTablero.empezarProceso(palabrasIngresadas, 'f'); //empieza el proceso en modo fácil
-                break;
-            case "m":
-                 guiTablero.empezarProceso(palabrasIngresadas, 'm');
-                break;
-            case "d":
-                 guiTablero.empezarProceso(palabrasIngresadas, 'd');
-                break; 
-        }
-        
-        try {
-            guiTablero.start(new Stage());
-        } catch (Exception ex) {
-            Logger.getLogger(GUISopaDeLetrasController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        guiTablero.lanzarVista();
-        Stage stage = (Stage) button.getScene().getWindow();
-        stage.close();
     }
 
     /**
@@ -114,17 +121,37 @@ public class GUISopaDeLetrasController implements Initializable {
      */
     @FXML
     private void buttonGuardarPalabraEvent(ActionEvent event) {
-        //valida que un contador sea menor o igual al numero que el usuario solicitó ingresar manualmete
-        if (contadorPalabrasAgregadas <= numeroPalabras) {
-            if (!textFieldIngresarPalabra.getText().trim().equals("")) {
-                label.setText(textFieldIngresarPalabra.getText() + " añadida");
-                palabrasIngresadas.add(textFieldIngresarPalabra.getText());
-                contadorPalabrasAgregadas++; // incrementamos el contador
+        if (checkBoxManual.isSelected()) {
+            //valida que un contador sea menor o igual al numero que el usuario solicitó ingresar manualmete
+            if (palabrasIngresadas.size() < numeroPalabras) {
+                if (!textFieldIngresarPalabra.getText().trim().equals("") || textFieldIngresarPalabra.getText().length() > tamanioTablero - 2) {
+                    labelInfo.setText(contadorPalabrasAgregadas + 1 + ") " + textFieldIngresarPalabra.getText() + " añadida");
+                    labelInfo.setVisible(true);
+                    palabrasIngresadas.add(textFieldIngresarPalabra.getText());
+                    contadorPalabrasAgregadas++; // incrementamos el contador
+                } else {
+                    labelInfo.setText("Ingrese una palabra válida");
+                }
             } else {
-                label.setText("Ingrese una palabra válida");
+                labelInfo.setText("Se han agregado todas las palabras");
             }
-        } else {
-            label.setText("Se han agregado todas las palabras");
+        }
+
+        if (checkBoxMixta.isSelected()) {
+            numeroPalabras = (comboBoxNumeroPalabras.getValue() != null) ? comboBoxNumeroPalabras.getValue() : 0;//obtiene el valor que ingresó el usuario referente al numero de palabras
+            numeroPalabrasAleatorias = comboBoxNumeroPalabrasAleatorias.getValue();
+            if (palabrasIngresadas.size() < numeroPalabras) {
+                if (!textFieldIngresarPalabra.getText().trim().equals("") || textFieldIngresarPalabra.getText().length() > tamanioTablero - 2) {
+                    labelInfo.setText(contadorPalabrasAgregadas + 1 + ") " + textFieldIngresarPalabra.getText() + " añadida");
+                    labelInfo.setVisible(true);
+                    palabrasIngresadas.add(textFieldIngresarPalabra.getText());
+                    contadorPalabrasAgregadas++; // incrementamos el contador
+                } else {
+                    labelInfo.setText("Ingrese una palabra válida");
+                }
+            } else {
+                labelInfo.setText("Se han agregado todas las palabras");
+            }
         }
 
     }
@@ -174,7 +201,7 @@ public class GUISopaDeLetrasController implements Initializable {
             comboBoxTamanioTablero.getItems().addAll(
                     6, 7, 8
             );
-            
+
             return "f";
         }
         if (radioButtonMedio.isSelected()) {
@@ -182,7 +209,7 @@ public class GUISopaDeLetrasController implements Initializable {
             comboBoxTamanioTablero.getItems().addAll(
                     9, 10, 11
             );
-            
+
             return "m";
         }
         if (radioButtonDificil.isSelected()) {
@@ -190,10 +217,10 @@ public class GUISopaDeLetrasController implements Initializable {
             comboBoxTamanioTablero.getItems().addAll(
                     12, 13, 14
             );
-            
+
             return "d";
         }
-        return null;
+        return "f";// se envia dificultad facil por defecto
     }
 
     /**
@@ -259,9 +286,15 @@ public class GUISopaDeLetrasController implements Initializable {
 
     @FXML
     private void checkBoxManualEvent(ActionEvent event) {
+        tamanioTablero = (comboBoxTamanioTablero.getValue() != null) ? comboBoxTamanioTablero.getValue() : 0; //obtiene el valor que ingresó el usuario referente al tamaño del tablero
+        numeroPalabras = (comboBoxNumeroPalabras.getValue() != null) ? comboBoxNumeroPalabras.getValue() : 0;//obtiene el valor que ingresó el usuario referente al numero de palabras
+        contadorPalabrasAgregadas = 0;
+        palabrasIngresadas.clear();
+
         if (devolverModoPalabras() == null) {
             checkBoxManual.setSelected(true);
         }
+        comboBoxNumeroPalabrasAleatorias.setDisable(true);
         textFieldIngresarPalabra.setDisable(false);
         buttonGuardarPalabra.setDisable(false);
         if (checkBoxMixta.isSelected()) {
@@ -273,12 +306,19 @@ public class GUISopaDeLetrasController implements Initializable {
     }
 
     @FXML
-    private void checkBoxMixtaEvent(ActionEvent event) {
+    private void checkBoxMixtaEvent(ActionEvent event) throws IOException {
+        tamanioTablero = (comboBoxTamanioTablero.getValue() != null) ? comboBoxTamanioTablero.getValue() : 0; //obtiene el valor que ingresó el usuario referente al tamaño del tablero
+        numeroPalabras = (comboBoxNumeroPalabras.getValue() != null) ? comboBoxNumeroPalabras.getValue() : 0;//obtiene el valor que ingresó el usuario referente al numero de palabras
+        contadorPalabrasAgregadas = 0;
+        numeroPalabrasAleatorias = 0;
+
         if (devolverModoPalabras() == null) {
             checkBoxMixta.setSelected(true);
         }
         textFieldIngresarPalabra.setDisable(false);
         buttonGuardarPalabra.setDisable(false);
+        comboBoxNumeroPalabrasAleatorias.setDisable(false);
+
         if (checkBoxManual.isSelected()) {
             checkBoxManual.setSelected(false);
         }
@@ -289,77 +329,104 @@ public class GUISopaDeLetrasController implements Initializable {
     }
 
     @FXML
-    private void checkBoxAleatorioEvent(ActionEvent event) {
+    private void checkBoxAleatorioEvent(ActionEvent event) throws IOException {
+        contadorPalabrasAgregadas = 0;
+        tamanioTablero = (comboBoxTamanioTablero.getValue() != null) ? comboBoxTamanioTablero.getValue() : 0; //obtiene el valor que ingresó el usuario referente al tamaño del tablero
+        numeroPalabras = (comboBoxNumeroPalabras.getValue() != null) ? comboBoxNumeroPalabras.getValue() : 0;//obtiene el valor que ingresó el usuario referente al numero de palabras
+        palabrasIngresadas.clear();
+        palabrasIngresadas = generarPalabras(numeroPalabras, tamanioTablero);//Se llena la lista con las palabras aleatorias. 
+
         if (devolverModoPalabras() == null) {
             checkBoxAleatorio.setSelected(true);
         }
+        comboBoxNumeroPalabrasAleatorias.setDisable(true);
         textFieldIngresarPalabra.setDisable(true);
         buttonGuardarPalabra.setDisable(true);
+
         if (checkBoxMixta.isSelected()) {
             checkBoxMixta.setSelected(false);
         }
+
         if (checkBoxManual.isSelected()) {
             checkBoxManual.setSelected(false);
         }
     }
-    
-    @FXML
+
     private void comboBoxTamanioTableroEvent(ActionEvent event) {
-        
-       if(comboBoxTamanioTablero.getValue()==6){
-          comboBoxNumeroPalabras.getItems().clear();
+
+        if (comboBoxTamanioTablero.getValue() == 6) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     4, 5, 6
             );
-       }
-       if(comboBoxTamanioTablero.getValue()==7){
-          comboBoxNumeroPalabras.getItems().clear();
+        }
+        if (comboBoxTamanioTablero.getValue() == 7) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     5, 6, 7
             );
-       }
-       if(comboBoxTamanioTablero.getValue()==8){
-          comboBoxNumeroPalabras.getItems().clear();
+        }
+        if (comboBoxTamanioTablero.getValue() == 8) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     6, 7, 8
             );
-       }
-       if(comboBoxTamanioTablero.getValue()==9){
-          comboBoxNumeroPalabras.getItems().clear();
+        }
+        if (comboBoxTamanioTablero.getValue() == 9) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     7, 8, 9
             );
-       }
-       if(comboBoxTamanioTablero.getValue()==10){
-          comboBoxNumeroPalabras.getItems().clear();
+        }
+        if (comboBoxTamanioTablero.getValue() == 10) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     8, 9, 10
             );
-       }
-       if(comboBoxTamanioTablero.getValue()==11){
-          comboBoxNumeroPalabras.getItems().clear();
+        }
+        if (comboBoxTamanioTablero.getValue() == 11) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     9, 10, 11
             );
-       }
-       if(comboBoxTamanioTablero.getValue()==12){
-          comboBoxNumeroPalabras.getItems().clear();
+        }
+        if (comboBoxTamanioTablero.getValue() == 12) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     10, 11, 12
             );
-       }
-       if(comboBoxTamanioTablero.getValue()==13){
-          comboBoxNumeroPalabras.getItems().clear();
+        }
+        if (comboBoxTamanioTablero.getValue() == 13) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     11, 12, 13
             );
-       }
-       if(comboBoxTamanioTablero.getValue()==14){
-          comboBoxNumeroPalabras.getItems().clear();
+        }
+        if (comboBoxTamanioTablero.getValue() == 14) {
+            comboBoxNumeroPalabras.getItems().clear();
             comboBoxNumeroPalabras.getItems().addAll(
                     12, 13, 14
             );
-       }
-       
+        }
+
     }
+
+    @FXML
+    private void comboBoxNumeroPalabrasEvent(ActionEvent event) {
+        if (comboBoxNumeroPalabras.getValue() > 1) {
+            comboBoxNumeroPalabrasAleatorias.getItems().clear();
+            IntStream.rangeClosed(1, comboBoxNumeroPalabras.getValue() - 1).boxed().forEach(comboBoxNumeroPalabrasAleatorias.getItems()::add);
+        }
+    }
+
+    @FXML
+    private void comboBoxNumeroPalabrasAleatoriasEvent(ActionEvent event) throws IOException {
+        palabrasIngresadas.clear();
+        tamanioTablero = (comboBoxTamanioTablero.getValue() != null) ? comboBoxTamanioTablero.getValue() : 0; //obtiene el valor que ingresó el usuario referente al tamaño del tablero
+        int numeroPalabrasAleatorias = (comboBoxNumeroPalabrasAleatorias.getValue() != null) ? comboBoxNumeroPalabrasAleatorias.getValue() : comboBoxNumeroPalabras.getValue();
+        List<String> palabrasAleatoriasAcotadas = generarPalabras(numeroPalabrasAleatorias, tamanioTablero);//Se llena la lista con las palabras aleatorias. 
+        palabrasIngresadas.addAll(palabrasAleatoriasAcotadas);
+
+    }
+
 }
